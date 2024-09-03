@@ -89,18 +89,6 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
     }
 
     /**
-     * Refresh 토큰 검증 성공 핸들러
-     */
-    public void verifiedRefreshTokenHandler(HttpServletResponse res, String newAccessToken) throws IOException {
-        res.setStatus(SC_OK);
-        res.setContentType("application/json");
-        String json = new ObjectMapper().writeValueAsString(
-                new AuthenticatedResponse(newAccessToken, "리프레시 토큰 검증 성공 & 새로운 토큰 발급")
-        );
-        res.getWriter().write(json);
-    }
-
-    /**
      * Refresh 토큰 검증 실패 핸들러
      */
     public void unverifiedRefreshTokenHandler(HttpServletResponse res) throws IOException {

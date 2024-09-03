@@ -65,7 +65,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String refreshToken = UUID.randomUUID().toString();
 
         // 헤더에 액세스 토큰 추가
-        res.addHeader(TokenProvider.ACCESS_TOKEN_HEADER, accessToken);
+        res.addHeader("token", accessToken);
 
         // 쿠키에 리프레시 토큰 추가
         tokenProvider.saveRefreshTokenToCookie(refreshToken, res);
@@ -78,7 +78,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         res.setCharacterEncoding("UTF-8");
         res.setContentType("application/json");
         String json = new ObjectMapper().writeValueAsString(
-                new AuthenticatedResponse(accessToken, "로그인 성공")
+                new AuthenticatedResponse(accessToken)
         );
         res.getWriter().write(json);
     }
