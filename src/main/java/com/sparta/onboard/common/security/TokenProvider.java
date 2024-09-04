@@ -11,6 +11,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -123,6 +124,8 @@ public class TokenProvider {
             log.error("지원되지 않는 JWT 입니다.");
         } catch (IllegalArgumentException e) {
             log.error("잘못된 JWT 입니다.");
+        } catch (SignatureException e) {
+            log.error("잘못된 JWT 서명입니다.");
         }
         return false;
     }
