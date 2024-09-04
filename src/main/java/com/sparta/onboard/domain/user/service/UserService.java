@@ -6,6 +6,7 @@ import com.sparta.onboard.common.security.UserDetailsImpl;
 import com.sparta.onboard.domain.user.constant.UserRoleEnum;
 import com.sparta.onboard.domain.user.dto.SignupRequestDto;
 import com.sparta.onboard.domain.user.dto.SignupResponseDto;
+import com.sparta.onboard.domain.user.dto.UserDetailResponseDto;
 import com.sparta.onboard.domain.user.entity.User;
 import com.sparta.onboard.domain.user.repository.UserRepository;
 import java.util.List;
@@ -45,5 +46,11 @@ public class UserService {
                 savedUser.getNickname(),
                 authorities
         );
+    }
+
+    public UserDetailResponseDto getUserDetail(User user) {
+        return new UserDetailResponseDto(user.getUsername(),
+                user.getNickname(),
+                user.getRole().toString());
     }
 }
