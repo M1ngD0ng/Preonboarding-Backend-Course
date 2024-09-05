@@ -11,6 +11,7 @@ import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.UnsupportedJwtException;
 import io.jsonwebtoken.security.Keys;
+import io.jsonwebtoken.security.SignatureException;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
@@ -33,7 +34,7 @@ public class TokenProvider {
 
     public static final String JWT_PREFIX = "Bearer ";
     public static final String ACCESS_TOKEN_HEADER = "Authorization";
-    public static final String REFRESH_TOKEN_COOKIE = "RefreshToken";
+    public static final String REFRESH_TOKEN_HEADER = "RefreshToken";
     
     private final RefreshTokenRepository refreshTokenRepository;
     
@@ -65,21 +66,6 @@ public class TokenProvider {
     }
 
     /**
-     * Cookie에 Refresh 토큰 저장
-     */
-    public void saveRefreshTokenToCookie(String refreshToken, HttpServletResponse response) {
-        ResponseCookie cookie = ResponseCookie.from(REFRESH_TOKEN_COOKIE, refreshToken)
-                .httpOnly(true)
-//                .secure(true)
-                .path("/")
-                .maxAge(accessTokenTtl)
-                .sameSite("Strict")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
-    }
-
-    /**
      * Header에서 Access 토큰 가져오기
      */
     public String getAccessToken(HttpServletRequest request) {
@@ -92,19 +78,15 @@ public class TokenProvider {
     }
 
     /**
-     * Cookie에서 Refresh 토큰 가져오기
+     * Header에서 Refresh 토큰 가져오기
      */
     public String getRefreshToken(HttpServletRequest request) {
-        Cookie[] cookies = request.getCookies();
-        if (cookies == null) {
+        String bearerToken = request.getHeader(REFRESH_TOKEN_HEADER);
+        if (StringUtils.hasText(bearerToken)) {
+            return bearerToken;
+        } else {
             return null;
         }
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals(REFRESH_TOKEN_COOKIE)) {
-                return cookie.getValue();
-            }
-        }
-        return null;
     }
 
     /**
@@ -123,6 +105,8 @@ public class TokenProvider {
             log.error("지원되지 않는 JWT 입니다.");
         } catch (IllegalArgumentException e) {
             log.error("잘못된 JWT 입니다.");
+        } catch (SignatureException e) {
+            log.error("잘못된 JWT 서명입니다.");
         }
         return false;
     }
