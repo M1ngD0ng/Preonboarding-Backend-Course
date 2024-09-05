@@ -53,11 +53,9 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
                     String newAccessToken = tokenProvider.createAccessToken(username);
                     String newRefreshToken = UUID.randomUUID().toString();
 
-                    log.info("리프레시 토큰 쿠키에 저장");
-                    tokenProvider.saveRefreshTokenToCookie(newRefreshToken, res);
-
-                    log.info("액세스 토큰 응답");
+                    log.info("토큰 응답");
                     res.addHeader(TokenProvider.ACCESS_TOKEN_HEADER, newAccessToken);
+                    res.addHeader(TokenProvider.REFRESH_TOKEN_HEADER, newRefreshToken);
                     setAuthentication(username);
                 } else {
                     log.error("리프레시 토큰 검증 실패");
@@ -93,6 +91,7 @@ public class JwtAuthorizationFilter extends OncePerRequestFilter {
      */
     public void unverifiedRefreshTokenHandler(HttpServletResponse res) throws IOException {
         res.setStatus(SC_UNAUTHORIZED);
+        res.setCharacterEncoding("UTF-8");
         res.setContentType("application/json");
         String json = new ObjectMapper().writeValueAsString(
                 new UnauthenticatedResponse("리프레시 토큰 검증 실패")

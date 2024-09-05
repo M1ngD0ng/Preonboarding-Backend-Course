@@ -1,6 +1,5 @@
 package com.sparta.onboard.common.config;
 
-import com.sparta.onboard.common.security.JwtAuthenticationFilter;
 import com.sparta.onboard.common.security.JwtAuthorizationFilter;
 import com.sparta.onboard.common.security.TokenProvider;
 import com.sparta.onboard.common.security.UserDetailsServiceImpl;
@@ -42,13 +41,6 @@ public class WebSecurityConfig {
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() throws Exception {
-        JwtAuthenticationFilter filter = new JwtAuthenticationFilter(tokenProvider, refreshTokenService);
-        filter.setAuthenticationManager(authenticationManager(authenticationConfiguration));
-        return filter;
-    }
-
-    @Bean
     public JwtAuthorizationFilter jwtAuthorizationFilter() {
         return new JwtAuthorizationFilter(tokenProvider, refreshTokenService, userDetailsService);
     }
@@ -71,9 +63,7 @@ public class WebSecurityConfig {
                 .anyRequest().authenticated()
         );
 
-        // 필터 관리
-        http.addFilterBefore(jwtAuthorizationFilter(), JwtAuthenticationFilter.class);
-        http.addFilterBefore(jwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(jwtAuthorizationFilter(), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
